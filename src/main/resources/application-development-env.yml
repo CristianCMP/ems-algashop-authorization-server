@@ -16,7 +16,8 @@ spring:
                 - products:write
             token:
               access-token-time-to-live: 15m
-              access-token-format: reference # Opaque
+#              access-token-format: reference # Opaque
+              access-token-format: self-contained # JWT - Is default
           algashop-ordering-service-client:
             registration:
               client-id: algashop-ordering-service

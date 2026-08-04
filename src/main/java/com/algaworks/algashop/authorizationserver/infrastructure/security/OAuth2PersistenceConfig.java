@@ -1,4 +1,4 @@
-package com.algaworks.algashop.authorizationserver.config;
+package com.algaworks.algashop.authorizationserver.infrastructure.security;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -8,7 +8,7 @@ import org.springframework.security.oauth2.server.authorization.client.Registere
 import org.springframework.stereotype.Component;
 
 @Component
-public class PersistenceConfig {
+public class OAuth2PersistenceConfig {
 
     @Bean
     public JdbcOAuth2AuthorizationService authorizationService(

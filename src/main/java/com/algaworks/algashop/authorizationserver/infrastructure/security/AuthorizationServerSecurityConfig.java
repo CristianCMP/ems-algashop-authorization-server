@@ -1,5 +1,6 @@
 package com.algaworks.algashop.authorizationserver.infrastructure.security;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
@@ -14,15 +15,27 @@ import org.springframework.security.web.util.matcher.MediaTypeRequestMatcher;
 
 @Configuration
 @EnableWebSecurity
+@RequiredArgsConstructor
 public class AuthorizationServerSecurityConfig {
+
+    private final OidcUserInfoMapper oidcUserInfoMapper;
 
     @Bean
     @Order(1)
     public SecurityFilterChain authorizeRequests(HttpSecurity http) {
         var authorizationServer = new OAuth2AuthorizationServerConfigurer();
 
+//        Function<OidcUserInfoAuthenticationContext, OidcUserInfo> userInfoMapper = (context) -> {
+//            OidcUserInfoAuthenticationToken authentication = context.getAuthentication();
+//            JwtAuthenticationToken principal = (JwtAuthenticationToken) authentication.getPrincipal();
+//
+//            return new OidcUserInfo(principal.getToken().getClaims());
+//        };
+
         http.securityMatcher(authorizationServer.getEndpointsMatcher())
-                .with(authorizationServer, configurer ->configurer.oidc(Customizer.withDefaults())                )
+                .with(authorizationServer, configurer -> configurer.oidc(oidc ->
+                        oidc.userInfoEndpoint(
+                                userInfo -> userInfo.userInfoMapper(oidcUserInfoMapper/*userInfoMapper*/))))
                 .authorizeHttpRequests(authorize -> authorize.anyRequest().authenticated())
                 .exceptionHandling(exception -> exception.defaultAuthenticationEntryPointFor(
                         new LoginUrlAuthenticationEntryPoint("/login"),

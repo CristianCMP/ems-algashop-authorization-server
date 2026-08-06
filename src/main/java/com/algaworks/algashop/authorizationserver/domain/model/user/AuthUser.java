@@ -4,10 +4,7 @@ import com.algaworks.algashop.authorizationserver.domain.model.AbstractAuditable
 import com.algaworks.algashop.authorizationserver.domain.model.DomainException;
 import com.algaworks.algashop.authorizationserver.domain.model.IdGenerator;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.Objects;
@@ -16,8 +13,10 @@ import java.util.UUID;
 @Entity
 @Table(name = "auth_user")
 @Getter
+@Builder
 @EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = false)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
 public class AuthUser extends AbstractAuditableAggregateRoot<AuthUser> {
 
     @Id
@@ -32,28 +31,37 @@ public class AuthUser extends AbstractAuditableAggregateRoot<AuthUser> {
     @Enumerated(EnumType.STRING)
     private AuthUserType type;
 
-    public static AuthUser brandNew(String name, String email, AuthUserType type, String passwordHash) {
-        AuthUser authUser = new AuthUser();
+    public static AuthUser brandNew(String email,
+                                    String name,
+                                    AuthUserType type,
+                                    String passwordHash) {
+        AuthUser user = new AuthUser();
 
-        authUser.setId(IdGenerator.generateTimeBasedUUID());
-        authUser.setEmail(email);
-        authUser.setName(name);
-        authUser.setType(type);
-        authUser.setPassword(passwordHash);
-        authUser.setEnabled(true);
+        user.setId(IdGenerator.generateTimeBasedUUID());
+        user.setEmail(email);
+        user.setName(name);
+        user.setType(type);
+        user.setPassword(passwordHash);
+        user.setEnabled(true);
 
-        return authUser;
+        return user;
+    }
+
+    public void anonymize() {
+        this.setName("Anonymized User");
+        this.setEmail("anonymized-" + this.id + "@deleted.local");
+        this.setEnabled(false);
     }
 
     public void setPassword(String password) {
-        if(StringUtils.isBlank(password)) {
+        if (StringUtils.isBlank(password)) {
             throw new IllegalArgumentException();
         }
         this.password = password;
     }
 
     public void setName(String name) {
-        if(StringUtils.isBlank(name)) {
+        if (StringUtils.isBlank(name)) {
             throw new IllegalArgumentException();
         }
         this.name = name;
@@ -71,14 +79,13 @@ public class AuthUser extends AbstractAuditableAggregateRoot<AuthUser> {
         this.type = type;
     }
 
-
     private void setId(UUID id) {
         Objects.requireNonNull(id);
         this.id = id;
     }
 
     private void setEmail(String email) {
-        if(StringUtils.isBlank(email)) {
+        if (StringUtils.isBlank(email)) {
             throw new IllegalArgumentException();
         }
         this.email = email;

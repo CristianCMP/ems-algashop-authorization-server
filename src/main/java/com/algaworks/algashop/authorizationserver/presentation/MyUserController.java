@@ -18,6 +18,6 @@ public class MyUserController {
 
     @GetMapping
     public AuthUserOutput getMe() {
-        return authUserQueryService.findById(securityCheck.getAuthenticationUserId());
+        return authUserQueryService.findById(securityCheck.getAuthenticatedUserId());
     }
 }

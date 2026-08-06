@@ -1,4 +1,4 @@
-package com.algaworks.algashop.authorizationserver.infrastructure.precistence;
+package com.algaworks.algashop.authorizationserver.infrastructure.persistence;
 
 import com.algaworks.algashop.authorizationserver.infrastructure.security.query.OAuth2AuthorizationQueryService;
 import lombok.RequiredArgsConstructor;

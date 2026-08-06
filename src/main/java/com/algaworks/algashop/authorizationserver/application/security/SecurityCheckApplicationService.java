@@ -3,9 +3,9 @@ package com.algaworks.algashop.authorizationserver.application.security;
 import java.util.UUID;
 
 public interface SecurityCheckApplicationService {
-    UUID getAuthenticationUserId();
+    UUID getAuthenticatedUserId();
 
     boolean isAuthenticated();
 
-    boolean isMachineAuthorized();
+    boolean isMachineAuthenticated();
 }

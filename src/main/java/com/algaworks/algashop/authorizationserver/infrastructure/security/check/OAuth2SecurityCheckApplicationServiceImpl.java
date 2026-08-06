@@ -15,28 +15,39 @@ import java.util.UUID;
 public class OAuth2SecurityCheckApplicationServiceImpl implements SecurityCheckApplicationService {
 
     @Override
-    public UUID getAuthenticationUserId() {
-        if (isMachineAuthorized()) {
-            throw new AccessDeniedException("Machine user do not have user ID");
+    public UUID getAuthenticatedUserId() {
+        if (isMachineAuthenticated()) {
+            throw new AccessDeniedException("Machine users do not have user ID");
         }
         Jwt jwt = getJwt();
 
         try {
             return UUID.fromString(jwt.getSubject());
         } catch (IllegalAccessError e) {
-            log.error("Invalide user Id in HWT subject: {}", jwt.getSubject(), e);
-            throw new AccessDeniedException("Invalid user Id in HWT subject");
+            log.error("Invalid user ID in JWT subject: {}", jwt.getSubject(), e);
+            throw new AccessDeniedException("Invalid user ID in JWT subject");
         }
     }
 
     @Override
     public boolean isAuthenticated() {
-        return getAuthentication().isAuthenticated();
+        try {
+            return getAuthentication().isAuthenticated();
+        } catch (IllegalStateException e) {
+            log.debug(e.getMessage(), e);
+            return false;
+        }
     }
 
     @Override
-    public boolean isMachineAuthorized() {
-        Jwt jwt = getJwt();
+    public boolean isMachineAuthenticated() {
+        Jwt jwt;
+        try {
+            jwt = getJwt();
+        } catch (IllegalStateException e) {
+            log.debug(e.getMessage(), e);
+            return false;
+        }
         return jwt.getAudience().contains(jwt.getSubject());
     }
 
@@ -45,17 +56,14 @@ public class OAuth2SecurityCheckApplicationServiceImpl implements SecurityCheckA
         if (authentication.getPrincipal() instanceof Jwt jwt) {
             return jwt;
         }
-
         throw new IllegalStateException("Authentication principal is not a JWT");
     }
 
     private Authentication getAuthentication() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
         if (authentication == null) {
             throw new IllegalStateException("No authentication found");
         }
-
         return authentication;
     }
 }

@@ -3,11 +3,11 @@ package com.algaworks.algashop.authorizationserver.presentation;
 import com.algaworks.algashop.authorizationserver.application.user.management.AuthUserInput;
 import com.algaworks.algashop.authorizationserver.application.user.management.AuthUserManagementApplicationService;
 import com.algaworks.algashop.authorizationserver.application.user.query.AuthUserOutput;
+import com.algaworks.algashop.authorizationserver.infrastructure.security.check.SecurityAnnotations;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/users")
@@ -17,7 +17,10 @@ public class UserController {
     private final AuthUserManagementApplicationService managementService;
 
     @PostMapping
-    public AuthUserOutput create(@RequestBody AuthUserInput authUserInput) {
-        return managementService.create(authUserInput);
+    @ResponseStatus(HttpStatus.CREATED)
+    @SecurityAnnotations.CanWriteUsers
+    public AuthUserOutput create(@RequestBody @Valid AuthUserInput input) {
+        return managementService.create(input);
     }
+
 }

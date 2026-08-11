@@ -23,10 +23,36 @@ public class AlgaShopSecurityProperties {
     @Valid
     private CorsProperties cors;
 
+    @NotNull
+    @Valid
+    private CspProperties csp;
+
+    @NotNull
+    @Valid
+    private CookieProperties cookie;
+
     @Data
     @NoArgsConstructor
     public static class CorsProperties {
         @NotEmpty
         private List<String> allowedOrigins = new ArrayList<>();
+    }
+
+    @Data
+    @NoArgsConstructor
+    public static class CspProperties {
+        @NotEmpty
+        private String policyDirectives;
+    }
+
+    @Data
+    @NoArgsConstructor
+    public static class CookieProperties {
+        @NotEmpty
+        private String sameSite;
+        @NotEmpty
+        private String domainName;
+        @NotNull
+        private Boolean secure;
     }
 }

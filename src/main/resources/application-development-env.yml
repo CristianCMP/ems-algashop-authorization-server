@@ -20,7 +20,8 @@ spring:
 #      password: 123456
     oauth2:
       authorizationserver:
-        issuer: http://algashop-authorization-server:8081
+        #        issuer: http://auth.algashop.local:8081
+        issuer: http://auth.algashop.local:8081
         client:
           algashop-test-client:
             registration:
@@ -76,10 +77,11 @@ spring:
               client-authentication-methods:
                 - client_secret_basic
               redirect-uris:
-                - http://algashop-ecommerce:9080/login/oauth2/code/algashop-ecommerce-web
+                #                - http://algashop-ecommerce:9080/login/oauth2/code/algashop-ecommerce-web
+                - http://algashop.local:9080/login/oauth2/code/algashop-ecommerce-web
                 - https://oauth.pstmn.io/v1/callback
               post-logout-redirect-uris:
-                - http://algashop-ecommerce:9080?logout-success
+                - http://algashop.local:9080?logout-success
               scopes:
                 - credit-cards:read
                 - credit-cards:write
@@ -120,10 +122,13 @@ spring:
               client-authentication-methods:
                 - none # Public client without authentication
               redirect-uris:
-                - http://algashop-admin:4200
-                - http://algashop-admin:4200/silent-refresh.html
+#                - http://algashop-admin:4200
+#                - http://algashop-admin:4200/silent-refresh.html
+                - http://admin.algashop.local:4200
+                - http://admin.algashop.local:4200/silent-refresh.html
               post-logout-redirect-uris:
-                - http://algashop-admin:4200
+#                - http://algashop-admin:4200
+                - http://admin.algashop.local:4200
               scopes:
                 - products:read
                 - products:write
@@ -146,8 +151,15 @@ spring:
 algashop:
   security:
     cors:
-      allowedOrigins:
-        - http://algashop-admin:4200
+      allowed-origins:
+        - http://admin.algashop.local:4200
+    cookie:
+      secure: false # HTTPS
+      same-site: Lax # None, Lax, Strict
+      domain-name: algashop.local
+    csp:
+      policy-directives: frame-ancestor 'self' http://admin.algashop.local:4200 http://auth.algashop.local:8081
+
 
 logging:
   level:

@@ -1,6 +1,7 @@
 package com.algaworks.algashop.authorizationserver.infrastructure.security;
 
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
@@ -14,9 +15,9 @@ import java.util.List;
 
 @Component
 @Data
-@NoArgsConstructor
 @Validated
 @ConfigurationProperties("algashop.security")
+@NoArgsConstructor
 public class AlgaShopSecurityProperties {
 
     @NotNull
@@ -25,11 +26,11 @@ public class AlgaShopSecurityProperties {
 
     @NotNull
     @Valid
-    private CspProperties csp;
+    private CookieProperties cookie;
 
     @NotNull
     @Valid
-    private CookieProperties cookie;
+    private CspProperties csp;
 
     @Data
     @NoArgsConstructor
@@ -40,19 +41,19 @@ public class AlgaShopSecurityProperties {
 
     @Data
     @NoArgsConstructor
-    public static class CspProperties {
-        @NotEmpty
-        private String policyDirectives;
-    }
-
-    @Data
-    @NoArgsConstructor
     public static class CookieProperties {
-        @NotEmpty
+        @NotBlank
         private String sameSite;
-        @NotEmpty
+        @NotBlank
         private String domainName;
         @NotNull
         private Boolean secure;
     }
+
+    @Data
+    @NoArgsConstructor
+    public static class CspProperties {
+        private String policyDirectives;
+    }
+
 }

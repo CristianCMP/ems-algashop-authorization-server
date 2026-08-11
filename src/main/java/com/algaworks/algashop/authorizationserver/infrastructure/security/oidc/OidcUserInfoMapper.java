@@ -21,8 +21,11 @@ public class OidcUserInfoMapper implements Function<OidcUserInfoAuthenticationCo
         if (idTokenHolder == null) {
             Authentication authentication = context.getAuthentication();
             JwtAuthenticationToken principal = (JwtAuthenticationToken) authentication.getPrincipal();
+            if (principal == null || principal.getToken() == null) {
+                throw new IllegalArgumentException();
+            }
             return OidcUserInfo.builder()
-                    .claim("sub",principal.getToken().getClaims().get("sub"))
+                    .claim("sub", principal.getToken().getClaims().get("sub"))
                     .build();
         }
 

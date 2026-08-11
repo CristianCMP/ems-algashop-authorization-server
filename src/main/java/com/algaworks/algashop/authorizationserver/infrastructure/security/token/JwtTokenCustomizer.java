@@ -27,7 +27,7 @@ public class JwtTokenCustomizer implements OAuth2TokenCustomizer<JwtEncodingCont
         }
     }
 
-    private boolean isUserDelegatedFlow(AuthorizationGrantType authorizationGrantType){
+    private boolean isUserDelegatedFlow(AuthorizationGrantType authorizationGrantType) {
         return isAuthCodeFlow(authorizationGrantType) || isRefreshTokenFlow(authorizationGrantType);
     }
 
@@ -42,12 +42,12 @@ public class JwtTokenCustomizer implements OAuth2TokenCustomizer<JwtEncodingCont
         context.getClaims().claims(claims -> claims.putAll(oidcUserInfo.getClaims()));
     }
 
-    private boolean isRefreshTokenFlow(AuthorizationGrantType authorizationGrant) {
-        return AuthorizationGrantType.REFRESH_TOKEN.equals(authorizationGrant);
+    private boolean isRefreshTokenFlow(AuthorizationGrantType authorizationGrantType) {
+        return AuthorizationGrantType.REFRESH_TOKEN.equals(authorizationGrantType);
     }
 
-    private boolean isAuthCodeFlow(AuthorizationGrantType authorizationGrant) {
-        return AuthorizationGrantType.AUTHORIZATION_CODE.equals(authorizationGrant);
+    private boolean isAuthCodeFlow(AuthorizationGrantType authorizationGrantType) {
+        return AuthorizationGrantType.AUTHORIZATION_CODE.equals(authorizationGrantType);
     }
 
     private OidcUserInfo loadUser(JwtEncodingContext context) {

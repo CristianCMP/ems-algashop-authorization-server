@@ -133,8 +133,6 @@ public class OAuth2SecurityCheckApplicationServiceImpl
             return false;
         }
 
-
-//        return authentication.getAuthorities().contains(new SimpleGrantedAuthority(rawAuthority));
         return authentication.getAuthorities()
                 .stream().anyMatch(a -> Objects.equals(a.getAuthority(), rawAuthority));
     }

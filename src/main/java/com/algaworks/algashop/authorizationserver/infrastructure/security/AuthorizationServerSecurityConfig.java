@@ -54,10 +54,11 @@ public class AuthorizationServerSecurityConfig {
                                 .userInfoEndpoint(userInfo ->
                                         userInfo.userInfoMapper(oidcUserInfoMapper/*userInfoMapper*/))))
                 .authorizeHttpRequests(authorize -> authorize.anyRequest().authenticated())
-                .exceptionHandling(exception -> exception.defaultAuthenticationEntryPointFor(
-                        new LoginUrlAuthenticationEntryPoint("/login"),
-                        new MediaTypeRequestMatcher(MediaType.TEXT_HTML)
-                ));
+                .exceptionHandling(exceptions -> exceptions.defaultAuthenticationEntryPointFor(
+                                new LoginUrlAuthenticationEntryPoint("/login"),
+                                new MediaTypeRequestMatcher(MediaType.TEXT_HTML)
+                        )
+                );
 
         return http.build();
     }
@@ -82,7 +83,6 @@ public class AuthorizationServerSecurityConfig {
     public SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) {
         http.authorizeHttpRequests(authorize -> authorize.anyRequest().authenticated())
                 .formLogin(Customizer.withDefaults());
-
         return http.build();
     }
 }

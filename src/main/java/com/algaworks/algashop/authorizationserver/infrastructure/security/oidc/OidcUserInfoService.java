@@ -22,7 +22,7 @@ public class OidcUserInfoService {
                 .name(authUser.getName())
                 .email(authUser.getEmail())
                 .claim("type", authUser.getType().name())
-                .claim("createdAt", String.valueOf(authUser.getCreatedAt().toEpochSecond()))
+                .claim("created_at", String.valueOf(authUser.getCreatedAt().toEpochSecond()))
                 .build();
     }
 }

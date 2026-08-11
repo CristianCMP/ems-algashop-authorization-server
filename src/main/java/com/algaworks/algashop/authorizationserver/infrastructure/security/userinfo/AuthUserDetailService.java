@@ -19,6 +19,7 @@ public class AuthUserDetailService implements UserDetailsService {
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         AuthUser authUser = authUserRepository.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found " + email));
+
         return User.withUsername(email)
                 .password(authUser.getPassword())
                 .disabled(!authUser.isEnabled())

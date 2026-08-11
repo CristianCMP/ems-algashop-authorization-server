@@ -23,7 +23,7 @@ public class CorsConfig {
 
         var source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", cors);
-
         return source;
     }
+
 }

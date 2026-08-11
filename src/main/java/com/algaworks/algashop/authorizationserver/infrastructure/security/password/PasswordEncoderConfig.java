@@ -17,9 +17,10 @@ public class PasswordEncoderConfig {
     public PasswordEncoder passwordEncoder() {
         Map<String, PasswordEncoder> encoders = new HashMap<>();
 
-        encoders.put("dcrypt", new BCryptPasswordEncoder());
+        encoders.put("bcrypt", new BCryptPasswordEncoder());
         encoders.put("noop", NoOpPasswordEncoder.getInstance());
 
-        return new DelegatingPasswordEncoder("dcrypt",encoders);
+        return new DelegatingPasswordEncoder("bcrypt", encoders);
     }
+
 }

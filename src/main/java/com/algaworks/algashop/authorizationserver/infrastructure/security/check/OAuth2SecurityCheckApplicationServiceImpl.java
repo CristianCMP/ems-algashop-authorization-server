@@ -1,6 +1,7 @@
 package com.algaworks.algashop.authorizationserver.infrastructure.security.check;
 
 import com.algaworks.algashop.authorizationserver.application.security.SecurityCheckApplicationService;
+import com.algaworks.algashop.authorizationserver.domain.model.user.AuthUserType;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
@@ -8,11 +9,15 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 
+import java.util.Objects;
 import java.util.UUID;
 
 @Service(value = "securityCheck")
 @Slf4j
 public class OAuth2SecurityCheckApplicationServiceImpl implements SecurityCheckApplicationService {
+
+    private static final String SCOPE_USER_WRITE = "SCOPE_users:write";
+    private static final String ROLE_MANAGER = "ROLE_" + AuthUserType.MANAGER.name();
 
     @Override
     public UUID getAuthenticatedUserId() {
@@ -54,6 +59,44 @@ public class OAuth2SecurityCheckApplicationServiceImpl implements SecurityCheckA
     @Override
     public boolean canAccessOwnProfile() {
         return this.isAuthenticated() && !isMachineAuthenticated();
+    }
+
+    @Override
+    public boolean canRegisterUserOfType(AuthUserType registrationType) {
+        if (!isAuthenticated()) {
+            return false;
+        }
+
+        if (!hasAuthority(SCOPE_USER_WRITE)) {
+            return false;
+        }
+
+        if (registrationType == AuthUserType.CUSTOMER) {
+            return isMachineAuthenticated();
+        }
+
+        if (hasAuthority(ROLE_MANAGER)) {
+            return registrationType == AuthUserType.MANAGER
+                    || registrationType == AuthUserType.OPERATOR;
+        }
+
+        return false;
+    }
+
+    private boolean hasAuthority(String rawAuthority) {
+        Authentication authentication;
+        try {
+            authentication = getAuthentication();
+        } catch (IllegalStateException e) {
+            log.debug(e.getMessage(), e);
+            return false;
+        }
+
+
+//        return authentication.getAuthorities().contains(new SimpleGrantedAuthority(rawAuthority));
+        return authentication.getAuthorities()
+                .stream()
+                .anyMatch(a -> Objects.equals(a.getAuthority(), rawAuthority));
     }
 
     private Jwt getJwt() {

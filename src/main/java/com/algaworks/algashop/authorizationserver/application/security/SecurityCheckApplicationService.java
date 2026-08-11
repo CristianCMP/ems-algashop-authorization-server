@@ -1,5 +1,7 @@
 package com.algaworks.algashop.authorizationserver.application.security;
 
+import com.algaworks.algashop.authorizationserver.domain.model.user.AuthUserType;
+
 import java.util.UUID;
 
 public interface SecurityCheckApplicationService {
@@ -9,4 +11,6 @@ public interface SecurityCheckApplicationService {
 
     boolean isMachineAuthenticated();
     boolean canAccessOwnProfile();
+
+    boolean canRegisterUserOfType(AuthUserType registrationType);
 }

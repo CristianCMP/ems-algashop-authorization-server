@@ -6,11 +6,10 @@ import java.util.UUID;
 
 public interface SecurityCheckApplicationService {
     UUID getAuthenticatedUserId();
-
     boolean isAuthenticated();
-
     boolean isMachineAuthenticated();
     boolean canAccessOwnProfile();
-
     boolean canRegisterUserOfType(AuthUserType registrationType);
+    boolean canEditUser(AuthUserType editType, UUID userId);
+    boolean canChangeUserType(AuthUserType currentType, AuthUserType newType);
 }

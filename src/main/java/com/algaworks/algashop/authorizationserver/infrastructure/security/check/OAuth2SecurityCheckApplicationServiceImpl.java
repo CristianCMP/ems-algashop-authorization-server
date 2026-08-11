@@ -12,11 +12,12 @@ import org.springframework.stereotype.Service;
 import java.util.Objects;
 import java.util.UUID;
 
-@Service(value = "securityCheck")
+@Service("securityCheck")
 @Slf4j
-public class OAuth2SecurityCheckApplicationServiceImpl implements SecurityCheckApplicationService {
+public class OAuth2SecurityCheckApplicationServiceImpl
+        implements SecurityCheckApplicationService {
 
-    private static final String SCOPE_USER_WRITE = "SCOPE_users:write";
+    private static final String SCOPE_USERS_WRITE = "SCOPE_users:write";
     private static final String ROLE_MANAGER = "ROLE_" + AuthUserType.MANAGER.name();
 
     @Override
@@ -67,7 +68,7 @@ public class OAuth2SecurityCheckApplicationServiceImpl implements SecurityCheckA
             return false;
         }
 
-        if (!hasAuthority(SCOPE_USER_WRITE)) {
+        if (!hasAuthority(SCOPE_USERS_WRITE)) {
             return false;
         }
 
@@ -78,6 +79,46 @@ public class OAuth2SecurityCheckApplicationServiceImpl implements SecurityCheckA
         if (hasAuthority(ROLE_MANAGER)) {
             return registrationType == AuthUserType.MANAGER
                     || registrationType == AuthUserType.OPERATOR;
+        }
+
+        return false;
+    }
+
+    @Override
+    public boolean canEditUser(AuthUserType editType, UUID editUserId) {
+        if (isMachineAuthenticated()) {
+            return false;
+        }
+
+        try {
+            if (getAuthenticatedUserId().equals(editUserId)) {
+                return true;
+            }
+        } catch (AccessDeniedException e) {
+            return false;
+        }
+
+        if (hasAuthority(ROLE_MANAGER)) {
+            return editType == AuthUserType.MANAGER || editType == AuthUserType.OPERATOR;
+        }
+
+        return false;
+    }
+
+    @Override
+    public boolean canChangeUserType(AuthUserType currentType, AuthUserType newType) {
+        if (currentType == newType) {
+            return true;
+        }
+
+        if (hasAuthority(ROLE_MANAGER)) {
+            if (currentType == AuthUserType.MANAGER && newType == AuthUserType.OPERATOR) {
+                return true;
+            }
+
+            if (currentType == AuthUserType.OPERATOR && newType == AuthUserType.MANAGER) {
+                return true;
+            }
         }
 
         return false;
@@ -95,8 +136,7 @@ public class OAuth2SecurityCheckApplicationServiceImpl implements SecurityCheckA
 
 //        return authentication.getAuthorities().contains(new SimpleGrantedAuthority(rawAuthority));
         return authentication.getAuthorities()
-                .stream()
-                .anyMatch(a -> Objects.equals(a.getAuthority(), rawAuthority));
+                .stream().anyMatch(a -> Objects.equals(a.getAuthority(), rawAuthority));
     }
 
     private Jwt getJwt() {

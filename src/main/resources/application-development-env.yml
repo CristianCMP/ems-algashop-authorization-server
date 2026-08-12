@@ -151,6 +151,7 @@ spring:
 
 algashop:
   security:
+    default-redirect-uri: http://algashop.local:9080
     cors:
       allowed-origins:
         - http://admin.algashop.local:4200

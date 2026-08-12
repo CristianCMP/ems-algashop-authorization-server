@@ -4,7 +4,10 @@ import com.algaworks.algashop.authorizationserver.domain.model.AbstractAuditable
 import com.algaworks.algashop.authorizationserver.domain.model.DomainException;
 import com.algaworks.algashop.authorizationserver.domain.model.IdGenerator;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 
 import java.time.Duration;
@@ -15,10 +18,8 @@ import java.util.UUID;
 @Entity
 @Table(name = "auth_user")
 @Getter
-@Builder
 @EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = false)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor
 public class AuthUser extends AbstractAuditableAggregateRoot<AuthUser> {
 
     @Id
@@ -62,6 +63,19 @@ public class AuthUser extends AbstractAuditableAggregateRoot<AuthUser> {
         return plainToken;
     }
 
+    public void changePasswordWithToken(String plainToken,
+                                        String plainPassword,
+                                        AuthUserPasswordManager passwordManager,
+                                        VerificationTokenHasher tokenHasher
+    ) {
+        verifyToken(plainToken, tokenHasher);
+        setPassword(passwordManager.encrypt(plainPassword));
+        cleanVerificationToken();
+        if (!isEmailVerified()) {
+            setEmailVerified(true);
+        }
+    }
+
     public boolean isDisabled() {
         return !isEmailVerified() || !isEnabled();
     }
@@ -89,6 +103,28 @@ public class AuthUser extends AbstractAuditableAggregateRoot<AuthUser> {
             throw new DomainException("Cannot change type of a CUSTOMER user");
         }
         this.type = type;
+    }
+
+    private void verifyToken(String plainToken, VerificationTokenHasher tokenHasher) {
+        if (!tokenHasher.isEqual(this.verificationToken, plainToken)) {
+            throw new IllegalArgumentException("Invalid token");
+        }
+
+        if (isTokenExpired()) {
+            throw new IllegalStateException("Token has expired");
+        }
+    }
+
+    private boolean isTokenExpired() {
+        if (verificationTokenExpirationDate == null) {
+            return true;
+        }
+        return OffsetDateTime.now().isAfter(verificationTokenExpirationDate);
+    }
+
+    private void cleanVerificationToken() {
+        this.verificationToken = null;
+        this.verificationTokenExpirationDate = null;
     }
 
     private void setPassword(String password) {

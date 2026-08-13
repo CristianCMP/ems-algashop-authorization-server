@@ -1,6 +1,7 @@
 package com.algaworks.algashop.authorizationserver.application.user.management;
 
 import com.algaworks.algashop.authorizationserver.application.user.UserAccountProperties;
+import com.algaworks.algashop.authorizationserver.application.user.mail.AuthUserMailSender;
 import com.algaworks.algashop.authorizationserver.application.user.query.AuthUserNotFoundException;
 import com.algaworks.algashop.authorizationserver.domain.model.user.AuthUser;
 import com.algaworks.algashop.authorizationserver.domain.model.user.AuthUserPasswordManager;
@@ -18,35 +19,37 @@ import java.util.UUID;
 @Transactional
 public class PasswordManagementApplicationService {
 
-	private final AuthUserRepository authUserRepository;
-	private final UserAccountProperties userAccountProperties;
-	private final AuthUserPasswordManager passwordManager;
-	private final VerificationTokenHasher tokenHasher;
+    private final AuthUserRepository authUserRepository;
+    private final UserAccountProperties userAccountProperties;
+    private final AuthUserPasswordManager passwordManager;
+    private final VerificationTokenHasher tokenHasher;
 
-	public void changePasswordWithToken(String plainToken, String newPlainPassword) {
-		String hash = tokenHasher.hash(plainToken);
-		AuthUser authUser = authUserRepository.findByVerificationToken(hash)
-				.orElseThrow(() -> new AuthUserNotFoundException("User not found by verification token"));
+    private final AuthUserMailSender authUserMailSender;
 
-		try {
-			authUser.changePasswordWithToken(plainToken, newPlainPassword, passwordManager, tokenHasher);
-		} catch (IllegalArgumentException | IllegalStateException e) {
-			throw new AccessDeniedException(e.getMessage());
-		}
+    public void changePasswordWithToken(String plainToken, String newPlainPassword) {
+        String hash = tokenHasher.hash(plainToken);
+        AuthUser authUser = authUserRepository.findByVerificationToken(hash)
+                .orElseThrow(() -> new AuthUserNotFoundException("User not found by verification token"));
 
-		authUserRepository.save(authUser);
-	}
+        try {
+            authUser.changePasswordWithToken(plainToken, newPlainPassword, passwordManager, tokenHasher);
+        } catch (IllegalArgumentException | IllegalStateException e) {
+            throw new AccessDeniedException(e.getMessage());
+        }
 
-	public void requestPasswordChange(UUID userId) {
-		AuthUser authUser = authUserRepository.findById(userId)
-				.orElseThrow(() -> new AuthUserNotFoundException(userId));
+        authUserRepository.save(authUser);
+    }
 
-		String plainToken = authUser.generateVerificationToken(
-				userAccountProperties.getToken().getPasswordResetTtl(), tokenHasher);
+    public void requestPasswordChange(UUID userId) {
+        AuthUser authUser = authUserRepository.findById(userId)
+                .orElseThrow(() -> new AuthUserNotFoundException(userId));
 
-		System.out.println("Plain token: " + plainToken);
+        String plainToken = authUser.generateVerificationToken(
+                userAccountProperties.getToken().getPasswordResetTtl(), tokenHasher);
 
-		authUserRepository.save(authUser);
-	}
+        authUserMailSender.sendPasswordChangeEmail(authUser, plainToken);
+
+        authUserRepository.save(authUser);
+    }
 
 }

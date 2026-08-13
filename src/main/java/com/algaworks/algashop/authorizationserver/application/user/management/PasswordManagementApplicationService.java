@@ -19,37 +19,46 @@ import java.util.UUID;
 @Transactional
 public class PasswordManagementApplicationService {
 
-    private final AuthUserRepository authUserRepository;
-    private final UserAccountProperties userAccountProperties;
-    private final AuthUserPasswordManager passwordManager;
-    private final VerificationTokenHasher tokenHasher;
+	private final AuthUserRepository authUserRepository;
+	private final UserAccountProperties userAccountProperties;
+	private final AuthUserPasswordManager passwordManager;
+	private final VerificationTokenHasher tokenHasher;
 
-    private final AuthUserMailSender authUserMailSender;
+	private final AuthUserMailSender authUserMailSender;
 
-    public void changePasswordWithToken(String plainToken, String newPlainPassword) {
-        String hash = tokenHasher.hash(plainToken);
-        AuthUser authUser = authUserRepository.findByVerificationToken(hash)
-                .orElseThrow(() -> new AuthUserNotFoundException("User not found by verification token"));
+	public void changePasswordWithToken(String plainToken, String newPlainPassword) {
+		String hash = tokenHasher.hash(plainToken);
+		AuthUser authUser = authUserRepository.findByVerificationToken(hash)
+				.orElseThrow(() -> new AuthUserNotFoundException("User not found by verification token"));
 
-        try {
-            authUser.changePasswordWithToken(plainToken, newPlainPassword, passwordManager, tokenHasher);
-        } catch (IllegalArgumentException | IllegalStateException e) {
-            throw new AccessDeniedException(e.getMessage());
-        }
+		try {
+			authUser.changePasswordWithToken(plainToken, newPlainPassword, passwordManager, tokenHasher);
+		} catch (IllegalArgumentException | IllegalStateException e) {
+			throw new AccessDeniedException(e.getMessage());
+		}
 
-        authUserRepository.save(authUser);
-    }
+		authUserRepository.save(authUser);
+	}
 
-    public void requestPasswordChange(UUID userId) {
-        AuthUser authUser = authUserRepository.findById(userId)
-                .orElseThrow(() -> new AuthUserNotFoundException(userId));
+	public void requestPasswordChange(UUID userId) {
+		AuthUser authUser = authUserRepository.findById(userId)
+				.orElseThrow(() -> new AuthUserNotFoundException(userId));
 
-        String plainToken = authUser.generateVerificationToken(
-                userAccountProperties.getToken().getPasswordResetTtl(), tokenHasher);
+		requestPasswordChange(authUser);
+	}
 
-        authUserMailSender.sendPasswordChangeEmail(authUser, plainToken);
+	public void requestPasswordChange(String email) {
+		AuthUser authUser = authUserRepository.findByEmail(email)
+				.orElseThrow(() -> new AuthUserNotFoundException(email));
+		requestPasswordChange(authUser);
+	}
 
-        authUserRepository.save(authUser);
-    }
+	private void requestPasswordChange(AuthUser authUser) {
+		String plainToken = authUser.generateVerificationToken(
+				userAccountProperties.getToken().getPasswordResetTtl(), tokenHasher);
 
+		authUserMailSender.sendPasswordChangeEmail(authUser, plainToken);
+
+		authUserRepository.save(authUser);
+	}
 }

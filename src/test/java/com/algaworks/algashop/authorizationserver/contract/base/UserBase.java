@@ -41,13 +41,13 @@ class UserBase {
         RestAssuredMockMvc.enableLoggingOfRequestAndResponseIfValidationFails();
 
 
-        mockFindAllUsers();
+        mockFilterUsers();
         mockFindByIdValidUserId();
         mockFindByIdInvalidUserId();
-        mockDeleteInvalidUserId();
+        mockDeleteInvlidUserId();
     }
 
-    private void mockFindAllUsers() {
+    private void mockFilterUsers() {
         when(authUserQueryService.findAll(any(AuthUserFilter.class)))
                 .then(answer -> {
                     AuthUserFilter filter = answer.getArgument(0);
@@ -67,7 +67,7 @@ class UserBase {
 
     private void mockFindByIdValidUserId() {
         when(authUserQueryService.findById(validUserId))
-            .thenReturn(AuthUserOutputTestDataBuilder.aUser().id(validUserId).build());
+                .thenReturn(AuthUserOutputTestDataBuilder.aUser().id(validUserId).build());
     }
 
     private void mockFindByIdInvalidUserId() {
@@ -75,9 +75,9 @@ class UserBase {
                 .thenThrow(new AuthUserNotFoundException(invalidUserId));
     }
 
-    private void mockDeleteInvalidUserId() {
+    private void mockDeleteInvlidUserId() {
         doThrow(new AuthUserNotFoundException(invalidUserId))
-            .when(userManagementApplicationService)
-            .delete(invalidUserId);
+                .when(userManagementApplicationService)
+                .delete(invalidUserId);
     }
 }

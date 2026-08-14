@@ -4,10 +4,7 @@ import com.algaworks.algashop.authorizationserver.domain.model.AbstractAuditable
 import com.algaworks.algashop.authorizationserver.domain.model.DomainException;
 import com.algaworks.algashop.authorizationserver.domain.model.IdGenerator;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.apache.commons.lang3.StringUtils;
 
 import java.time.Duration;
@@ -18,8 +15,10 @@ import java.util.UUID;
 @Entity
 @Table(name = "auth_user")
 @Getter
+@Builder
 @EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = false)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
 public class AuthUser extends AbstractAuditableAggregateRoot<AuthUser> {
 
     @Id

@@ -12,27 +12,27 @@ import org.springframework.security.oauth2.server.authorization.settings.Authori
 import java.util.UUID;
 
 @TestConfiguration
-    public class TestSecurityConfig {
+public class TestSecurityConfig {
 
     @Bean
     AuthorizationServerSettings authorizationServerSettings() {
         return AuthorizationServerSettings.builder()
-            .issuer("http://localhost:9000")
-            .build();
+                .issuer("http://localhost:9000")
+                .build();
     }
 
     @Bean
     RegisteredClientRepository registeredClientRepository() {
         RegisteredClient client =
-            RegisteredClient.withId(UUID.randomUUID().toString())
-                .clientId("test-client")
-                .clientSecret("{noop}123")
-                .authorizationGrantType(
-                    AuthorizationGrantType.CLIENT_CREDENTIALS)
-                .clientAuthenticationMethod(
-                    ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
-                .scope("read")
-                .build();
+                RegisteredClient.withId(UUID.randomUUID().toString())
+                        .clientId("test-client")
+                        .clientSecret("{noop}123")
+                        .authorizationGrantType(
+                                AuthorizationGrantType.CLIENT_CREDENTIALS)
+                        .clientAuthenticationMethod(
+                                ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
+                        .scope("read")
+                        .build();
 
         return new InMemoryRegisteredClientRepository(client);
     }

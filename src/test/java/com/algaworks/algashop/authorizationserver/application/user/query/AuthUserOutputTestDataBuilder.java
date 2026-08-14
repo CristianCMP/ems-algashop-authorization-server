@@ -9,19 +9,19 @@ public class AuthUserOutputTestDataBuilder {
 
     public static AuthUserOutput.AuthUserOutputBuilder aUser() {
         return AuthUserOutput.builder()
-            .id(UUID.randomUUID())
-            .name("John Doe")
-            .email("john.doe@email.com")
-            .type(AuthUserType.MANAGER)
-            .enabled(true);
+                .id(UUID.randomUUID())
+                .name("John Doe")
+                .email("john.doe@email.com")
+                .type(AuthUserType.MANAGER)
+                .enabled(true);
     }
 
     public static AuthUserOutput.AuthUserOutputBuilder aUserAlt() {
         return AuthUserOutput.builder()
-            .id(UUID.randomUUID())
-            .name("Silvester Stalone")
-            .email("silvester.stalone@email.com")
-            .type(AuthUserType.OPERATOR)
-            .enabled(true);
+                .id(UUID.randomUUID())
+                .name("Silvester Stalone")
+                .email("silvester.stalone@email.com")
+                .type(AuthUserType.OPERATOR)
+                .enabled(true);
     }
 }

@@ -14,23 +14,22 @@ spring:
         access-key: test
         secret-key: test
   mail:
-    host: localhost
-    port: 1025
+    host: ${auth.params.mail.host}
+    port: ${auth.params.mail.port}
   session:
     store-type: jdbc
     timeout: 30m
   datasource:
     url: ${auth.params.datasource.url}
-#    url: jdbc:postgresql://localhost:5432/authorization_server
     username: ${auth.secrets.datasource.username}
     password: ${auth.secrets.datasource.password}
   jpa:
-    show-sql: true
+    show-sql: ${auth.params.jpa.show-sql}
   flyway:
     enabled: true
     locations: classpath:db/migration,classpath:db/testdata
-    user: postgres
-    password: postgres
+    user: ${auth.secrets.datasource.username}
+    password: ${auth.secrets.datasource.password}
     url: ${auth.params.datasource.url}
 #    url: jdbc:postgresql://localhost:5432/authorization_server
   security:
@@ -40,8 +39,6 @@ spring:
     oauth2:
       authorizationserver:
 #        issuer: http://auth.algashop.local:8081
-#        issuer: http://auth.algashop.local:8081
-#        issuer: ${auth.params.issuer}
         issuer: ${shared.params.auth-server-url}
         client:
           algashop-test-client:
@@ -82,7 +79,7 @@ spring:
                 - client_credentials
               client-authentication-methods:
                 - client_secret_basic
-              client-secret: "{noop}secret123"
+              client-secret: ${auth.params.clients.algashop-ordering-service.secret}
               scopes:
                 - products:read
             token:
@@ -91,7 +88,7 @@ spring:
           algashop-ecommerce-web-client:
             registration:
               client-id: algashop-ecommerce-web
-              client-secret: "{noop}ecommerce123"
+              client-secret: ${auth.params.clients.algashop-ecommerce-web.secret}
               client-name: AlgaShop Ecommerce  # not using for spring
               authorization-grant-types:
                 - authorization_code
@@ -102,8 +99,7 @@ spring:
 #                - http://algashop-ecommerce:9080/login/oauth2/code/algashop-ecommerce-web
 #                - http://algashop.local:9080/login/oauth2/code/algashop-ecommerce-web
 #                - https://oauth.pstmn.io/v1/callback
-              post-logout-redirect-uris:
-                - http://algashop.local:9080?logout-success
+              post-logout-redirect-uris: ${auth.params.clients.algashop-ecommerce-web.post-logout-redirect-uris}
               scopes:
                 - credit-cards:read
                 - credit-cards:write
@@ -128,7 +124,7 @@ spring:
                 - client_credentials
               client-authentication-methods:
                 - client_secret_basic
-              client-secret: "{noop}m2m123"
+              client-secret: ${auth.params.clients.algashop-ecommerce-m2m.secret}
               scopes:
                 - products:read
                 - categories:read
@@ -144,15 +140,16 @@ spring:
                 - authorization_code
               client-authentication-methods:
                 - none # Public client without authentication
-              redirect-uris:
+              redirect-uris: ${auth.params.clients.algashop-admin-web.redirect-uris}
 #                - http://algashop-admin:4200
 #                - http://algashop-admin:4200/silent-refresh.html
-                - http://admin.algashop.local:4200
-                - http://admin.algashop.local:4200/silent-refresh.html
-                - https://oauth.pstmn.io/v1/callback
-              post-logout-redirect-uris:
+#
+#                - http://admin.algashop.local:4200
+#                - http://admin.algashop.local:4200/silent-refresh.html
+#                - https://oauth.pstmn.io/v1/callback
+              post-logout-redirect-uris: ${auth.params.clients.algashop-admin-web.post-logout-redirect-uris}
 #                - http://algashop-admin:4200
-                - http://admin.algashop.local:4200
+#                - http://admin.algashop.local:4200
               scopes:
                 - products:read
                 - products:write
@@ -178,28 +175,34 @@ algashop:
       activation-ttl: PT24H
       password-reset-ttl: PT2H
     mail:
-      from: AlgaShop <no-reply@algashop.com>
-      password-change-url: http://auth.algashop.local:8081/change-password
+      from: ${auth.params.user-account.mail.from}
+      password-change-url: ${auth.params.user-account.password-change-url}
   security:
-    default-redirect-uri: http://algashop.local:9080
+    defaultRedirectUri: ${auth.params.security.defaultRedirectUri}
     cors:
-      allowed-origins:
-        - http://admin.algashop.local:4200
+      allowedOrigins: ${auth.params.security.cors.allowedOrigins}
     cookie:
-      secure: false # HTTPS
-      same-site: Lax # None, Lax, Strict
-      domain-name: algashop.local
+#      secure: false # HTTPS
+#      same-site: Lax # None, Lax, Strict
+#      domain-name: algashop.local
+      secure: ${auth.params.security.cookie.secure}
+      sameSite: ${auth.params.security.cookie.sameSite}
+      domainName: ${auth.params.security.cookie.domainName}
     csp:
-      policy-directives: frame-ancestor 'self' http://admin.algashop.local:4200 http://auth.algashop.local:8081
+      policyDirectives: ${auth.params.security.csp.policyDirectives}
+#      policy-directives: frame-ancestor 'self' http://admin.algashop.local:4200 http://auth.algashop.local:8081
 
 
 logging:
   level:
-    org.springframework.security: TRACE
+    org.springframework.security: ${auth.params.logging.security-level}
 
 management:
   info:
     env.enabled: true
+  health:
+    redis:
+      enabled: false
   endpoints:
     web:
       exposure:

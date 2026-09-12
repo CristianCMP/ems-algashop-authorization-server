@@ -2,6 +2,7 @@ spring:
   config:
     import:
       - aws-secretsmanager:/secret/algashop/authorization-server/database?prefix=auth.secrets.datasource. # ${auth.secrets.datasource.password}
+      - aws-parameterstore:/config/algashop/authorization-server?prefix=auth.params
   cloud:
     aws:
       region:
@@ -17,7 +18,8 @@ spring:
     store-type: jdbc
     timeout: 30m
   datasource:
-    url: jdbc:postgresql://localhost:5432/authorization_server
+    url: ${auth.params.datasource.url}
+#    url: jdbc:postgresql://localhost:5432/authorization_server
     username: ${auth.secrets.datasource.username}
     password: ${auth.secrets.datasource.password}
   jpa:
@@ -27,15 +29,17 @@ spring:
     locations: classpath:db/migration,classpath:db/testdata
     user: postgres
     password: postgres
-    url: jdbc:postgresql://localhost:5432/authorization_server
+    url: ${auth.params.datasource.url}
+#    url: jdbc:postgresql://localhost:5432/authorization_server
   security:
 #    user:
 #      name: customer@gmail.com
 #      password: 123456
     oauth2:
       authorizationserver:
-        #        issuer: http://auth.algashop.local:8081
-        issuer: http://auth.algashop.local:8081
+#        issuer: http://auth.algashop.local:8081
+#        issuer: http://auth.algashop.local:8081
+        issuer: ${auth.params.issuer}
         client:
           algashop-test-client:
             registration:
@@ -44,7 +48,8 @@ spring:
                 - client_credentials
               client-authentication-methods:
                 - client_secret_basic
-              client-secret: "{noop}testing123"
+#              client-secret: "{noop}testing123"
+              client-secret: ${auth.params.clients.algashop-test.secret}
               scopes:
                 - products:read
                 - products:write

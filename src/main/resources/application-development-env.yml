@@ -98,10 +98,10 @@ spring:
                 - refresh_token
               client-authentication-methods:
                 - client_secret_basic
-              redirect-uris:
-                #                - http://algashop-ecommerce:9080/login/oauth2/code/algashop-ecommerce-web
-                - http://algashop.local:9080/login/oauth2/code/algashop-ecommerce-web
-                - https://oauth.pstmn.io/v1/callback
+              redirect-uris: ${auth.params.clients.algashop-ecommerce-web.redirect-uris}
+#                - http://algashop-ecommerce:9080/login/oauth2/code/algashop-ecommerce-web
+#                - http://algashop.local:9080/login/oauth2/code/algashop-ecommerce-web
+#                - https://oauth.pstmn.io/v1/callback
               post-logout-redirect-uris:
                 - http://algashop.local:9080?logout-success
               scopes:

@@ -79,7 +79,7 @@ spring:
                 - client_credentials
               client-authentication-methods:
                 - client_secret_basic
-              client-secret: ${auth.params.clients.algashop-ordering-service.secret}
+              client-secret: ${auth.params.clients.algashop-ordering-service.secret} #secret123
               scopes:
                 - products:read
             token:

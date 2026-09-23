@@ -125,6 +125,7 @@ spring:
                 - client_credentials
               client-authentication-methods:
                 - client_secret_basic
+#              client-secret: "{noop}m2m123"
               client-secret: ${auth.params.clients.algashop-ecommerce-m2m.secret}
               scopes:
                 - products:read

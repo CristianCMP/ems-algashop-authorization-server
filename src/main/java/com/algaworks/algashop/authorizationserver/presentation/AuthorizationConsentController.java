@@ -24,10 +24,10 @@ public class AuthorizationConsentController {
 
 	@GetMapping(value = "/oauth2/consent")
 	public String consent(Principal principal, Model model,
-	                      @RequestParam(OAuth2ParameterNames.CLIENT_ID) String clientId,
-	                      @RequestParam(OAuth2ParameterNames.SCOPE) String scope,
-	                      @RequestParam(OAuth2ParameterNames.STATE) String state,
-	                      @RequestParam(name = OAuth2ParameterNames.USER_CODE, required = false) String userCode) {
+						  @RequestParam(OAuth2ParameterNames.CLIENT_ID) String clientId,
+						  @RequestParam(OAuth2ParameterNames.SCOPE) String scope,
+						  @RequestParam(OAuth2ParameterNames.STATE) String state,
+						  @RequestParam(name = OAuth2ParameterNames.USER_CODE, required = false) String userCode) {
 
 		Set<String> scopesToApprove = new HashSet<>();
 		Set<String> previouslyApprovedScopes = new HashSet<>();

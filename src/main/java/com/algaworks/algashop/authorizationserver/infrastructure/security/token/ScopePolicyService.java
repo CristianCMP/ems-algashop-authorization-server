@@ -16,7 +16,7 @@ public class ScopePolicyService {
     private final AuthUserClientScopesQueryService scopesQueryService;
 
     public Set<String> resolveScopes(AuthUserType role, String clientId, Set<String> authorizedScopes) {
-        if (authorizedScopes.isEmpty()){
+        if (authorizedScopes.isEmpty()) {
             return new HashSet<>();
         }
 

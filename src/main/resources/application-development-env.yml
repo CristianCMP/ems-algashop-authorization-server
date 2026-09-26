@@ -38,7 +38,6 @@ spring:
 #      password: 123456
     oauth2:
       authorizationserver:
-#        issuer: http://auth.algashop.local:8081
         issuer: ${shared.params.auth-server-url}
         client:
           algashop-test-client:
@@ -110,8 +109,9 @@ spring:
                 - customers:write
                 - shopping-carts:read
                 - shopping-carts:write
+                - invoices:read
                 - openid
-            require-authorization-consent: true
+            require-authorization-consent: false
             require-proof-key: false #PKCE
             token:
               access-token-time-to-live: 5m
@@ -222,5 +222,5 @@ eureka:
     healthcheck:
       enabled: true
   instance:
-    instance-id: ${random.uuid}
+    instanceId: ${random.uuid}
     prefer-ip-address: true

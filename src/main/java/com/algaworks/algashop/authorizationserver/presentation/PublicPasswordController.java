@@ -18,9 +18,9 @@ public class PublicPasswordController {
 
 	@GetMapping("/change-password")
 	public String passwordForm(
-            @RequestParam(name = "token", required = false)
-            String token,
-            Model model) {
+			@RequestParam(name = "token", required = false)
+			String token,
+			Model model) {
 		if (token == null || token.isBlank()) {
 			model.addAttribute("message", "Invalid token.");
 			model.addAttribute("success", false);
@@ -33,8 +33,8 @@ public class PublicPasswordController {
 
 	@PostMapping(path = "/change-password", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public String changePassword(@RequestParam("token") String token,
-	                              @RequestParam("newPassword") String newPassword,
-	                              Model model) {
+								 @RequestParam("newPassword") String newPassword,
+								 Model model) {
 		try {
 			passwordManagementService.changePasswordWithToken(token, newPassword);
 			model.addAttribute("message", "Password changed successfully.");

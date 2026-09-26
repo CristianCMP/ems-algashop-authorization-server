@@ -5,6 +5,7 @@ import com.algaworks.algashop.authorizationserver.application.user.query.AuthUse
 import com.algaworks.algashop.authorizationserver.domain.model.DomainException;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.jspecify.annotations.NonNull;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.*;
@@ -29,10 +30,10 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
     private final MessageSource messageSource;
 
     @Override
-    protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex,
-                                                                  HttpHeaders headers,
-                                                                  HttpStatusCode status,
-                                                                  WebRequest request) {
+    protected ResponseEntity<@NonNull Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex,
+                                                                           HttpHeaders headers,
+                                                                           HttpStatusCode status,
+                                                                           WebRequest request) {
         ProblemDetail problemDetail = ProblemDetail.forStatus(status);
         problemDetail.setTitle("Invalid fields");
         problemDetail.setDetail("One or more fields are invalid");
@@ -78,21 +79,21 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
         return problemDetail;
     }
 
-    @ExceptionHandler(AuthUserEmailAlreadyInUseException.class)
-    public ProblemDetail handleAuthUserEmailAlreadyInUseException(AuthUserEmailAlreadyInUseException e) {
-        ProblemDetail problemDetail = ProblemDetail.forStatus(HttpStatus.CONFLICT);
-        problemDetail.setTitle("Conflict");
-        problemDetail.setDetail(e.getMessage());
-        problemDetail.setType(URI.create("/errors/conflict"));
-        return problemDetail;
-    }
-
     @ExceptionHandler(AuthUserNotFoundException.class)
     public ProblemDetail handleAuthUserNotFoundException(AuthUserNotFoundException e) {
         ProblemDetail problemDetail = ProblemDetail.forStatus(HttpStatus.NOT_FOUND);
         problemDetail.setTitle("Not found");
         problemDetail.setDetail(e.getMessage());
         problemDetail.setType(URI.create("/errors/not-found"));
+        return problemDetail;
+    }
+
+    @ExceptionHandler(AuthUserEmailAlreadyInUseException.class)
+    public ProblemDetail handleAuthUserEmailAlreadyInUseException(AuthUserEmailAlreadyInUseException e) {
+        ProblemDetail problemDetail = ProblemDetail.forStatus(HttpStatus.CONFLICT);
+        problemDetail.setTitle("Conflict");
+        problemDetail.setDetail(e.getMessage());
+        problemDetail.setType(URI.create("/errors/conflict"));
         return problemDetail;
     }
 
@@ -104,5 +105,4 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
         problemDetail.setType(URI.create("/errors/unprocessable-entity"));
         return problemDetail;
     }
-
 }

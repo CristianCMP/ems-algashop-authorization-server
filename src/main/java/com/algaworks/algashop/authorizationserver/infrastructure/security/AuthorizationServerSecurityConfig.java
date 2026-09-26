@@ -38,7 +38,7 @@ public class AuthorizationServerSecurityConfig {
 
     @Bean
     @Order(1)
-    public SecurityFilterChain authorizeRequests(HttpSecurity http) {
+    public SecurityFilterChain authorizationServerFilterChain(HttpSecurity http) {
         var authorizationServer = new OAuth2AuthorizationServerConfigurer();
 
 //        Function<OidcUserInfoAuthenticationContext, OidcUserInfo> userInfoMapper = (context) -> {
@@ -59,15 +59,16 @@ public class AuthorizationServerSecurityConfig {
                         .oidc(oidc -> oidc
                                 .logoutEndpoint(logout ->
                                         logout.logoutResponseHandler(oidcLogoutAuthenticationSuccessHandler))
-                                .userInfoEndpoint(userInfo ->
-                                        userInfo.userInfoMapper(oidcUserInfoMapper/*userInfoMapper*/)))
+                                .userInfoEndpoint(
+                                        userInfo -> userInfo.userInfoMapper(oidcUserInfoMapper)))
                         .authorizationEndpoint(endpoint ->
                                 endpoint.authenticationProviders(this::customizeAuthenticationProviders)
                                         .consentPage("/oauth2/consent")
                         )
                 )
                 .authorizeHttpRequests(authorize -> authorize.anyRequest().authenticated())
-                .exceptionHandling(exceptions -> exceptions.defaultAuthenticationEntryPointFor(
+                .exceptionHandling(
+                        exceptions -> exceptions.defaultAuthenticationEntryPointFor(
                                 new LoginUrlAuthenticationEntryPoint("/login"),
                                 new MediaTypeRequestMatcher(MediaType.TEXT_HTML)
                         )
@@ -86,8 +87,8 @@ public class AuthorizationServerSecurityConfig {
 
     @Bean
     @Order(2)
-    public SecurityFilterChain publicSecurityFilterChain(HttpSecurity http){
-        http.securityMatcher("/change-password","/forgot-password")
+    public SecurityFilterChain publicSecurityFilterChain(HttpSecurity http) {
+        http.securityMatcher("/change-password", "/forgot-password")
                 .authorizeHttpRequests(authorize -> authorize.anyRequest().permitAll())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .requestCache(RequestCacheConfigurer::disable)
@@ -99,7 +100,7 @@ public class AuthorizationServerSecurityConfig {
     @Bean
     @Order(3)
     public SecurityFilterChain apiSecurityFilterChain(HttpSecurity http) {
-        http.securityMatcher("/api/**","/actuator/**")
+        http.securityMatcher("/api/**", "/actuator/**")
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/actuator/**").permitAll()
                         .anyRequest().authenticated())
@@ -115,8 +116,9 @@ public class AuthorizationServerSecurityConfig {
     @Order(4)
     public SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) {
         http.authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/login","/css/**","/js/**","/img/**","/favicon.ico").permitAll()
-                        .anyRequest().authenticated())
+                        .requestMatchers("/login", "/css/**", "/js/**", "/img/**", "/favicon.ico").permitAll()
+                        .anyRequest().authenticated()
+                )
                 .formLogin(c -> c.loginPage("/login")
                         .defaultSuccessUrl(properties.getDefaultRedirectUri())
                         .permitAll());

@@ -1,4 +1,4 @@
-package com.algaworks.algashop.authorizationserver.infrastructure.email;
+package com.algaworks.algashop.authorizationserver.infrastructure.mail;
 
 import com.algaworks.algashop.authorizationserver.application.user.UserAccountProperties;
 import com.algaworks.algashop.authorizationserver.application.user.mail.AuthUserMailSender;

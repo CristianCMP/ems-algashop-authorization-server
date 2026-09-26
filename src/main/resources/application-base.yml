@@ -13,6 +13,9 @@ spring:
 management:
   info:
     env.enabled: true
+  health:
+    redis:
+      enabled: false
   endpoints:
     web:
       exposure:
